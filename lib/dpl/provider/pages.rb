@@ -10,6 +10,7 @@ module DPL
         - target-branch [optional, defaults to gh-pages]
         - keep-history [optional, defaults to false]
         - allow-empty-commit [optional, defaults to false]
+        - create-signature-file [optional, defaults to true]
         - committer-from-gh [optional, defaults to false]
         - verbose [optional, defaults to false]
         - local-dir [optional, defaults to `pwd`]
@@ -41,6 +42,7 @@ module DPL
         @gh_token = option(:github_token)
         @keep_history = !!keep_history
         @allow_empty_commit = !!allow_empty_commit
+        @create_signature_file = !!create_signature_file
         @committer_from_gh = !!committer_from_gh
         @verbose = !!verbose
 
@@ -75,6 +77,11 @@ module DPL
         options.fetch(:allow_empty_commit, false)
       end
 
+      def create_signature_file
+        options.fetch(:create_signature_file, true)
+      end
+
+      
       def verbose
         # Achtung! Never verbosify git, since it may expose user's token.
         options.fetch(:verbose, false)
@@ -161,7 +168,7 @@ module DPL
       def github_commit
         committer_name, _ = identify_preferred_committer
         print_step "Preparing to deploy #{@target_branch} branch to gh-pages (workdir: #{Dir.pwd})"
-        context.shell "touch \"deployed at `date` by #{committer_name}\""
+        context.shell "touch \"deployed at `date` by #{committer_name}\"" if @create_signature_file
         context.shell "echo '#{@gh_fqdn}' > CNAME" if @gh_fqdn
         context.shell 'git add -A .'
         context.shell "git commit#{@git_commit_opts} -qm 'Deploy #{@project_name} to #{@gh_ref}:#{@target_branch}'"
