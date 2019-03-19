@@ -53,3 +53,12 @@ before_script:
 
 script:
   - rake
+
+dist: xenial
+deploy:
+  provider: pages
+  edge:
+    source: biodranik/dpl
+    branch: fix-xenial-pages-error
+  on:
+    branch: fix-xenial-pages-error-test
